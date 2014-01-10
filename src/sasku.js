@@ -4,11 +4,15 @@ var game = new Phaser.Game(1440, 900, Phaser.AUTO, '', { preload: preload, creat
 function preload() {
     game.load.image('background', 'bin/space_background2.jpg');
     game.load.image('cardback', 'bin/Blue_Back.png');
+    game.load.image('pixel', 'bin/px.png');
 }
  
 var cardback;
 var otherCards;
 var cards;
+var emitter;
+var star;
+var background;
 
 // kings, queens, jacks, aces, 10s, 9s, 8s, 7s
 var ck, cq, cj, ca, c0, c9, c8, c7; // clubs
@@ -24,7 +28,7 @@ function create() {
     this.game.stage.scale.pageAlignVeritcally = true;
     this.game.stage.scale.refresh();
 
-    game.add.tileSprite(0, 0, 1440, 900, 'background');
+    background = game.add.tileSprite(0, 0, 1440, 900, 'background');
 
     // other players' unrevealed card group
     otherCards = game.add.group();
@@ -34,13 +38,26 @@ function create() {
     cards = game.add.group();
     cards.createMultiple(12, 'card'); // technically 11 is max
 
-    cardback = game.add.sprite(300, 300, 'cardback');
-    cardback.scale.x = 1;
-    cardback.scale.y = 1;
+    cardback = game.add.sprite(300, 500, 'cardback');
 
-    
+
+    // a little particle effect on click
+    emitter = game.add.emitter(0, 0, 200);
+    emitter.makeParticles('pixel');
+    emitter.gravity = 0;
+    game.input.onDown.add(particleBurst, this);
+    background.inputEnabled = true;
+    cardback.inputEnabled = true;
 
 }
  
 function update() {
+}
+
+function particleBurst() {
+    if (!(game.input.activePointer.targetObject instanceof Object)) {
+        emitter.x = game.input.x;
+        emitter.y = game.input.y;
+        emitter.start(true, 500, null, 10);
+    }
 }
