@@ -5,6 +5,8 @@ function preload() {
     game.load.image('background', 'bin/space_background2.jpg');
     game.load.image('cardback', 'bin/Blue_Back.png');
     game.load.image('pixel', 'bin/px.png');
+    game.load.image('gamesbox', 'bin/gamesbox.png');
+    game.load.image('room', 'bin/room.png');
 }
  
 var cardback;
@@ -13,6 +15,8 @@ var cards;
 var emitter;
 var star;
 var background;
+var gamesbox;
+
 
 // kings, queens, jacks, aces, 10s, 9s, 8s, 7s
 var ck, cq, cj, ca, c0, c9, c8, c7; // clubs
@@ -30,6 +34,20 @@ function create() {
 
     background = game.add.tileSprite(0, 0, 1440, 900, 'background');
 
+    // games selection screen
+    gamesbox = game.add.sprite(400, 90, 'gamesbox');
+    var text = "Available games";
+    var style = { font: "48px Helvetica", fill: '#E0E0E0', stroke: 'black', strokeThickness: 1 };
+    var t = game.add.text(gamesbox.position.x + 64 , gamesbox.position.y + 32, text, style);
+    // the following will be created as games appear
+    var room = game.add.sprite(gamesbox.position.x + 20, gamesbox.position.y + 108, 'room'); // for the sake of testing
+    game.add.sprite(gamesbox.position.x + 20, gamesbox.position.y + 200, 'room'); // for the sake of testing
+    game.add.sprite(gamesbox.position.x + 20, gamesbox.position.y + 292, 'room'); // for the sake of testing
+    game.add.sprite(gamesbox.position.x + 20, gamesbox.position.y + 384, 'room'); // for the sake of testing
+    game.add.sprite(gamesbox.position.x + 20, gamesbox.position.y + 476, 'room'); // for the sake of testing
+    game.add.sprite(gamesbox.position.x + 20, gamesbox.position.y + 568, 'room'); // for the sake of testing
+
+
     // other players' unrevealed card group
     otherCards = game.add.group();
     otherCards.createMultiple(24, 'otherCard');
@@ -38,7 +56,7 @@ function create() {
     cards = game.add.group();
     cards.createMultiple(12, 'card'); // technically 11 is max
 
-    cardback = game.add.sprite(300, 500, 'cardback');
+    //cardback = game.add.sprite(300, 500, 'cardback');
 
 
     // a little particle effect on click
