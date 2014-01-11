@@ -12,6 +12,7 @@ function preload() {
     game.load.image('twoPlayers', 'bin/room2.png');
     game.load.image('threePlayers', 'bin/room3.png');
     game.load.image('fourPlayers', 'bin/room4.png');
+    game.load.spritesheet('createRoom', 'bin/createroom.png', 202, 72);
 }
  
 // misc
@@ -70,15 +71,6 @@ function create() {
     background.inputEnabled = true;
     //cardback.inputEnabled = true;
 
-    // for room selection screen
-    roomListBox = game.add.sprite(400, 90, 'roomListBox');
-    var titleStyle = { font: "48px Helvetica", fill: '#E0E0E0', stroke: 'black', strokeThickness: 1 };
-    title = game.add.text(roomListBox.position.x + 64 , roomListBox.position.y + 32, "Available games", titleStyle);
-    roomBoxGroup = game.add.group();
-    lockGroup = game.add.group();
-    lockGroup.createMultiple(6, 'lock');
-    playersInRoomGroup = game.add.group();
-    roomTextGroup = game.add.group(); // for removing text later
 
     // for testing room selection screen
     testRoomList = [{name: "let's play", id: "001", players: 1, password: true},
@@ -103,9 +95,21 @@ function particleBurst() {
 }
 
 function displayRoomSelection(roomList) {
+    roomListBox = game.add.sprite(400, 90, 'roomListBox');
+    var titleStyle = { font: "48px Helvetica", fill: '#E0E0E0', stroke: 'black', strokeThickness: 1 };
+    title = game.add.text(roomListBox.position.x + 48 , roomListBox.position.y + 32, "Available games", titleStyle);
+    roomBoxGroup = game.add.group();
+    lockGroup = game.add.group();
+    lockGroup.createMultiple(6, 'lock');
+    playersInRoomGroup = game.add.group();
+    roomTextGroup = game.add.group(); // for removing text later
+    var createRoomButton = game.add.button(roomListBox.position.x + 420, roomListBox.position.y + 16, 'createRoom', createRoom, this, 1, 0, 2);
+
+
+
     for (var i = 0; i < roomList.length; i++) {
         // a box for the room
-        var roomBox = new Phaser.Button(game, roomListBox.position.x + 20, roomListBox.position.y + 108 + i*92, 'roomBox', selectRoom.bind(undefined, i, roomList), this, 1, 0, 2); // bug
+        var roomBox = new Phaser.Button(game, roomListBox.position.x + 20, roomListBox.position.y + 108 + i*92, 'roomBox', selectRoom.bind(undefined, i, roomList), this, 1, 0, 2);
         game.add.roomBox
         roomBoxGroup.add(roomBox);
 
@@ -123,16 +127,16 @@ function displayRoomSelection(roomList) {
         var playersInRoom;
         switch (roomList[i]['players']) {
             case 1:
-                playersInRoom = game.add.sprite(roomBox.position.x + 460, roomBox.position.y, 'onePlayer');
+                playersInRoom = game.add.sprite(roomBox.position.x + 460, roomBox.position.y + 1, 'onePlayer');
                 break;
             case 2:
-                playersInRoom = game.add.sprite(roomBox.position.x + 460, roomBox.position.y, 'twoPlayers');
+                playersInRoom = game.add.sprite(roomBox.position.x + 460, roomBox.position.y + 1, 'twoPlayers');
                 break;
             case 3:
-                playersInRoom = game.add.sprite(roomBox.position.x + 460, roomBox.position.y, 'threePlayers');
+                playersInRoom = game.add.sprite(roomBox.position.x + 460, roomBox.position.y + 1, 'threePlayers');
                 break;
             case 4:
-                playersInRoom = game.add.sprite(roomBox.position.x + 460, roomBox.position.y, 'fourPlayers');
+                playersInRoom = game.add.sprite(roomBox.position.x + 460, roomBox.position.y + 1, 'fourPlayers');
                 break;
             default:
                 console.log("invalid number of players in room");
@@ -160,4 +164,8 @@ function selectRoom(n, roomList) {
         console.log("Starts a game...");
         console.log("Send server following msg: " + "{command: \"NEW\", name: " + roomList[n]['name'] + ", password: \"\"}");
     }
+}
+
+function createRoom() {
+    console.log("Room created.");
 }
