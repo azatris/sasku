@@ -6,7 +6,7 @@ function preload() {
     game.load.image('cardback', 'bin/Blue_Back.png');
     game.load.image('pixel', 'bin/px.png');
     game.load.image('roomListBox', 'bin/gamesbox.png');
-    game.load.image('roomBox', 'bin/room.png');
+    game.load.spritesheet('roomBox', 'bin/room.png', 602, 72);
     game.load.image('lock', 'bin/lock.png');
     game.load.image('onePlayer', 'bin/room1.png');
     game.load.image('twoPlayers', 'bin/room2.png');
@@ -17,6 +17,7 @@ function preload() {
 // misc
 var background;
 var emitter;
+var title;
 
 // sprites
 var roomListBox;
@@ -50,13 +51,6 @@ function create() {
 
     background = game.add.tileSprite(0, 0, 1440, 900, 'background');
 
-    // games selection screen
-    roomListBox = game.add.sprite(400, 90, 'roomListBox');
-    var text = "Available games";
-    var style = { font: "48px Helvetica", fill: '#E0E0E0', stroke: 'black', strokeThickness: 1 };
-    var t = game.add.text(roomListBox.position.x + 64 , roomListBox.position.y + 32, text, style);
-
-
     // other players' unrevealed card group
     otherCardGroup = game.add.group();
     otherCardGroup.createMultiple(24, 'otherCard');
@@ -77,8 +71,10 @@ function create() {
     //cardback.inputEnabled = true;
 
     // for room selection screen
+    roomListBox = game.add.sprite(400, 90, 'roomListBox');
+    var titleStyle = { font: "48px Helvetica", fill: '#E0E0E0', stroke: 'black', strokeThickness: 1 };
+    title = game.add.text(roomListBox.position.x + 64 , roomListBox.position.y + 32, "Available games", titleStyle);
     roomBoxGroup = game.add.group();
-    roomBoxGroup.createMultiple(6, 'roomBox');
     lockGroup = game.add.group();
     lockGroup.createMultiple(6, 'lock');
     playersInRoomGroup = game.add.group();
@@ -109,8 +105,8 @@ function particleBurst() {
 function displayRoomSelection(roomList) {
     for (var i = 0; i < roomList.length; i++) {
         // a box for the room
-        var roomBox = roomBoxGroup.getFirstExists(false);
-        roomBox.reset(roomListBox.position.x + 20, roomListBox.position.y + 108 + i*92);
+        var roomBox = game.add.button(roomListBox.position.x + 20, roomListBox.position.y + 108 + i*92, 'roomBox', selectRoom(i), this, 1, 0, 2);
+        roomBoxGroup.add(roomBox);
 
         // name of the room
         var styleName = { font: "36px Helvetica", fill: '#E0E0E0' };
@@ -153,4 +149,9 @@ function displayRoomSelection(roomList) {
             lock.reset(roomBox.position.x + 550, roomBox.position.y + 10);
         }
     }
+}
+
+function selectRoom(n) {
+    console.log("Selected room number " + n);
+    // extract info from roomList[n] to prompt for password and/or start/deny a game
 }
