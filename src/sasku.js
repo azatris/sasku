@@ -105,7 +105,8 @@ function particleBurst() {
 function displayRoomSelection(roomList) {
     for (var i = 0; i < roomList.length; i++) {
         // a box for the room
-        var roomBox = game.add.button(roomListBox.position.x + 20, roomListBox.position.y + 108 + i*92, 'roomBox', selectRoom(i), this, 1, 0, 2);
+        var roomBox = new Phaser.Button(game, roomListBox.position.x + 20, roomListBox.position.y + 108 + i*92, 'roomBox', selectRoom.bind(undefined, i, roomList), this, 1, 0, 2); // bug
+        game.add.roomBox
         roomBoxGroup.add(roomBox);
 
         // name of the room
@@ -151,7 +152,12 @@ function displayRoomSelection(roomList) {
     }
 }
 
-function selectRoom(n) {
-    console.log("Selected room number " + n);
+function selectRoom(n, roomList) {
     // extract info from roomList[n] to prompt for password and/or start/deny a game
+    if (roomList[n]['password']) {
+        console.log("Prompts for password.");
+    } else {
+        console.log("Starts a game...");
+        console.log("Send server following msg: " + "{command: \"NEW\", name: " + roomList[n]['name'] + ", password: \"\"}");
+    }
 }
