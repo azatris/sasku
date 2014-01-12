@@ -24,6 +24,7 @@ var title;
 var fps;
 var socket
 var availableRoomsCount = 0;
+var createRoomButton;
 
 // sprites
 var roomListBox;
@@ -33,41 +34,36 @@ var cardback;
 var testRoomList;
 
 // groups
-var cardGroup;
-var otherCardGroup;
 var roomBoxGroup;
 var playersInRoomGroup;
 var lockGroup;
 var roomTextGroup;
 
-
-// kings, queens, jacks, aces, 10s, 9s, 8s, 7s
-var ck, cq, cj, ca, c0, c9, c8, c7; // clubs
-var sk, sq, sj, sa, s0, s9, s8, s7; // spades
-var hk, hq, hj, ha, h0, h9, h8, h7; // hearts
-var dk, dq, dj, da, d0, d9, d8, d7; // diamonds
-
-
-
 function create() {
-    // aligning canvas to the centre
+    centreCanvas();
+
+    createBackground();
+    createFPSMeter();
+    createLobby();
+
+    setupConnection();
+}
+
+function centreCanvas() {
     this.game.stage.scale.pageAlignHorizontally = true;
     this.game.stage.scale.pageAlignVeritcally = true;
     this.game.stage.scale.refresh();
+}
 
+function createBackground() {
     background = game.add.tileSprite(0, 0, 1440, 900, 'background');
+    addFloatingParticles();
+    createParticleEmitter();
+    background.inputEnabled = true;
+}
 
-    // other players' unrevealed card group
-    otherCardGroup = game.add.group();
-    otherCardGroup.createMultiple(24, 'otherCard');
-
-    // the remaining revealed card group
-    cardGroup = game.add.group();
-    cardGroup.createMultiple(12, 'card'); // technically 11 is max
-
-    //cardback = game.add.sprite(300, 500, 'cardback');
-
-    // Siim: adds some dust particles floating around in the background
+// Siim: adds some dust particles floating around in the background
+function addFloatingParticles() {
     for (var i = 0; i < 150; i++) {
         if (Math.random() > 0.5) {
             var type = 'dust';
@@ -91,43 +87,38 @@ function create() {
         dustParticle.events.onOutOfBounds.add(wrapAround, this);
         dustParticle.events.onInputDown.add(particleClick, this);
     }   
+}
 
-
-    // a little particle effect on click
+function createParticleEmitter() {
     emitter = game.add.emitter(0, 0, 200);
     emitter.makeParticles('pixel');
     emitter.gravity = 0;
-    //game.input.onDown.add(particleBurst, this);
-    background.inputEnabled = true;
-    //cardback.inputEnabled = true;
+}
 
+function createFPSMeter() {
     var fpsStyle = { font: "11px Helvetica", fill: '#E0E0E0'};
     fps = game.add.text(game.width - 15, game.height - 10, game.time.fps, fpsStyle);
-
-    roomListBox = game.add.sprite(400, 90, 'roomListBox');
-    var titleStyle = { font: "40px Helvetica", fill: '#E0E0E0', stroke: 'black', strokeThickness: 1 };
-    title = game.add.text(roomListBox.position.x + 48 , roomListBox.position.y + 48, "Available rooms: 0", titleStyle);
-    roomBoxGroup = game.add.group();
-    lockGroup = game.add.group();
-    lockGroup.createMultiple(6, 'lock');
-    playersInRoomGroup = game.add.group();
-    roomTextGroup = game.add.group(); // for removing text later
-    var createRoomButton = game.add.button(roomListBox.position.x + 420, roomListBox.position.y + 56, 'createRoom', createRoom, this, 1, 0, 2);
-
-    setupConnection();
-    socket.emit("{ request: \"LIST\" ");
-    // for testing room selection screen
-    // testRoomList = [{name: "let's play", id: "001", players: 1, password: true},
-    //     {name: "noobs only", id: "002", players: 2, password: false},
-    //     {name: "silver's game", id: "003", players: 3, password: true},
-    //     {name: "sasku", id: "004", players: 4, password: true},
-    //     {name: "saskumees", id: "005", players: 2, password: false},
-    //     {name: "schafkopf", id: "006", players: 3, password: true},]
-    // availableRoomsCount = 6;
-    // displayRoomSelection(testRoomList);
-
 }
  
+function createLobby() {
+    // Creates the whole lobby window.
+    roomListBox = game.add.sprite(400, 90, 'roomListBox');
+
+    // Adds a title to the lobby window.
+    var titleStyle = { font: "40px Helvetica", fill: '#E0E0E0', stroke: 'black', strokeThickness: 1 };
+    title = game.add.text(roomListBox.position.x + 48 , roomListBox.position.y + 48, "Available rooms: 0", titleStyle);
+
+    // Creates groups for objects for easy removal.
+    roomBoxGroup = game.add.group();
+    playersInRoomGroup = game.add.group();
+    lockGroup = game.add.group();
+    lockGroup.createMultiple(6, 'lock');
+    roomTextGroup = game.add.group();
+
+    // Creates a button for creating a new room.
+    createRoomButton = game.add.button(roomListBox.position.x + 420, roomListBox.position.y + 56, 'createRoom', createRoom, this, 1, 0, 2);
+}
+
 function update() {
     emitter.forEachAlive(function(p){
         p.alpha= p.lifespan / emitter.lifespan;
@@ -159,14 +150,6 @@ function particleClick(particle) {
     emitter.y = particle.center.y;
     emitter.start(true, 500, null, 10);
 }
-
-// function particleBurst() {
-//     if (!(game.input.activePointer.targetObject instanceof Object)) {
-//         emitter.x = game.input.x;
-//         emitter.y = game.input.y;
-//         emitter.start(true, 500, null, 10);
-//     }
-// }
 
 function displayRoomSelection(roomList) {
     for (var i = 0; i < roomList.length; i++) {
@@ -229,19 +212,21 @@ function createRoom() {
 
 function setupConnection() {
     socket = io.connect('http://sasku.kaara.info');
-    socket.on('connecting', function() {
-        console.log("Connecting...");
-    });
-    socket.on('connect', function() {
-        console.log("Connected!");
-    });
-    socket.on('connect_failed', function() {
-        console.log("Connect failed!");
-    });
-    socket.on('info', function(data) {
-        console.log(data);
-    });
-    socket.on('message', function(message) {
+
+    addSocketEventListeners();
+
+    socket.emit("{ request: \"LIST\" ");
+}
+
+function addSocketEventListeners() {
+    socket.on('connecting', function() { console.log("Connecting..."); });
+    socket.on('connect', function() { console.log("Connected!"); });
+    socket.on('connect_failed', function() { console.log("Connect failed!"); });
+    socket.on('info', function(data) { console.log(data); });
+    socket.on('message', function(message) { parseMessage(message); });
+}
+
+function parseMessage(message) {
         switch (message['message']) {
             case "LIST":
                 if (message['status'] == "success") {
@@ -250,5 +235,4 @@ function setupConnection() {
                 }
                 break;
         }
-    });
 }
