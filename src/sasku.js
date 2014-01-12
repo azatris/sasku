@@ -2,7 +2,7 @@ var game = new Phaser.Game(1440, 900, Phaser.AUTO, '', { preload: preload, creat
 
 
 function preload() {
-    game.load.image('background', 'bin/space_background2.jpg');
+    game.load.image('background', 'bin/space_background.jpg');
     game.load.image('cardback', 'bin/Blue_Back.png');
     game.load.image('pixel', 'bin/px.png');
     game.load.image('roomListBox', 'bin/gamesbox.png');
@@ -12,6 +12,8 @@ function preload() {
     game.load.image('twoPlayers', 'bin/room2.png');
     game.load.image('threePlayers', 'bin/room3.png');
     game.load.image('fourPlayers', 'bin/room4.png');
+    game.load.image('dust', 'bin/dust.png'); // added by Siim
+    game.load.image('star', 'bin/star.png'); // added by Siim
     game.load.spritesheet('createRoom', 'bin/createroom.png', 202, 72);
 }
  
@@ -62,6 +64,31 @@ function create() {
 
     //cardback = game.add.sprite(300, 500, 'cardback');
 
+    // Siim: adds some dust particles floating around in the background
+    for (var i = 0; i < 150; i++) {
+        if (Math.random() > 0.5) {
+            var type = 'dust';
+            var scale = Math.random() + 0.15;
+            var alpha = Math.random()/8;
+        } else {
+            var type = 'star';
+            var scale = Math.random() + 0.02;
+            var alpha = Math.random()/4 + 0.75;
+        }
+        var dustParticle = game.add.sprite(Math.random()*game.width, Math.random()*game.height, type);
+        dustParticle.anchor.setTo(0.5, 0.5);
+        dustParticle.scale.setTo(scale, scale);
+        dustParticle.angle = Math.random()*360;
+        dustParticle.alpha = alpha;
+        var velocityAngle = Math.random()*2*Math.PI;
+        var velocityMagnitude = Math.random()+5;
+        dustParticle.body.velocity.setTo(velocityMagnitude*Math.cos(velocityAngle), velocityMagnitude*Math.sin(velocityAngle));
+        
+        dustParticle.inputEnabled = true;
+        dustParticle.events.onOutOfBounds.add(wrapAround, this);
+        dustParticle.events.onInputDown.add(particleClick, this);
+    }   
+
 
     // a little particle effect on click
     emitter = game.add.emitter(0, 0, 200);
@@ -84,15 +111,41 @@ function create() {
 }
  
 function update() {
+    emitter.forEachAlive(function(p){
+        p.alpha= p.lifespan / emitter.lifespan;
+    });
 }
 
-function particleBurst() {
-    if (!(game.input.activePointer.targetObject instanceof Object)) {
-        emitter.x = game.input.x;
-        emitter.y = game.input.y;
-        emitter.start(true, 500, null, 10);
+// Siim: resets the dust particle's position when it goes off screen
+function wrapAround(particle) {
+    if (particle.x < 0) {
+        particle.x = game.width + particle.width;
+    } else if (particle.x > game.width) {
+        particle.x = -particle.width;
+    } else if (particle.y < 0) {
+        particle.y = game.height + particle.height;
+    } else if (particle.y > game.height) {
+        particle.y = -particle.height;
     }
 }
+
+// Siim: do stuff when the dust particle is clicked
+function particleClick(particle) {
+    particle.x = Math.random()*game.width;
+    particle.y = Math.random()*game.height;
+
+    emitter.x = particle.center.x;
+    emitter.y = particle.center.y;
+    emitter.start(true, 500, null, 10);
+}
+
+// function particleBurst() {
+//     if (!(game.input.activePointer.targetObject instanceof Object)) {
+//         emitter.x = game.input.x;
+//         emitter.y = game.input.y;
+//         emitter.start(true, 500, null, 10);
+//     }
+// }
 
 function displayRoomSelection(roomList) {
     roomListBox = game.add.sprite(400, 90, 'roomListBox');
