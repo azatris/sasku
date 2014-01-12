@@ -94,7 +94,7 @@ function create() {
     emitter = game.add.emitter(0, 0, 200);
     emitter.makeParticles('pixel');
     emitter.gravity = 0;
-    game.input.onDown.add(particleBurst, this);
+    //game.input.onDown.add(particleBurst, this);
     background.inputEnabled = true;
     //cardback.inputEnabled = true;
 
