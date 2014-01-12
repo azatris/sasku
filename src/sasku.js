@@ -7,7 +7,7 @@ function preload() {
     game.load.image('pixel', 'bin/px.png');
     game.load.image('roomListBox', 'bin/gamesbox.png');
     game.load.spritesheet('roomBox', 'bin/room.png', 602, 72);
-    game.load.image('lock', 'bin/lock.png');
+    game.load.image('lock', 'bin/lock2.png');
     game.load.image('onePlayer', 'bin/room1.png');
     game.load.image('twoPlayers', 'bin/room2.png');
     game.load.image('threePlayers', 'bin/room3.png');
@@ -103,13 +103,13 @@ function displayRoomSelection(roomList) {
     lockGroup.createMultiple(6, 'lock');
     playersInRoomGroup = game.add.group();
     roomTextGroup = game.add.group(); // for removing text later
-    var createRoomButton = game.add.button(roomListBox.position.x + 420, roomListBox.position.y + 16, 'createRoom', createRoom, this, 1, 0, 2);
+    var createRoomButton = game.add.button(roomListBox.position.x + 420, roomListBox.position.y + 56, 'createRoom', createRoom, this, 1, 0, 2);
 
 
 
     for (var i = 0; i < roomList.length; i++) {
         // a box for the room
-        var roomBox = new Phaser.Button(game, roomListBox.position.x + 20, roomListBox.position.y + 108 + i*92, 'roomBox', selectRoom.bind(undefined, i, roomList), this, 1, 0, 2);
+        var roomBox = new Phaser.Button(game, roomListBox.position.x + 20, roomListBox.position.y + 148 + i*92, 'roomBox', selectRoom.bind(undefined, i, roomList), this, 1, 0, 2);
         game.add.roomBox
         roomBoxGroup.add(roomBox);
 
@@ -117,11 +117,6 @@ function displayRoomSelection(roomList) {
         var styleName = { font: "36px Helvetica", fill: '#E0E0E0' };
         var name = game.add.text(roomBox.position.x + 36 , roomBox.position.y + 17, roomList[i]['name'], styleName);
         roomTextGroup.add(name);
-
-        // ID of the room
-        var styleID = { font: "24px Helvetica", fill: '#E0E0E0' }
-        var id = game.add.text(roomBox.position.x + 346 , roomBox.position.y + 23, "ID: " + roomList[i]['id'], styleID);
-        roomTextGroup.add(id);
 
         // a graphical representation of the number of players in the room
         var playersInRoom;
