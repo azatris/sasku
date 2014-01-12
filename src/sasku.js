@@ -21,6 +21,9 @@ function preload() {
 var background;
 var emitter;
 var title;
+var fps;
+var socket
+var availableRoomsCount = 0;
 
 // sprites
 var roomListBox;
@@ -98,15 +101,30 @@ function create() {
     background.inputEnabled = true;
     //cardback.inputEnabled = true;
 
+    var fpsStyle = { font: "11px Helvetica", fill: '#E0E0E0'};
+    fps = game.add.text(game.width - 15, game.height - 10, game.time.fps, fpsStyle);
 
+    roomListBox = game.add.sprite(400, 90, 'roomListBox');
+    var titleStyle = { font: "40px Helvetica", fill: '#E0E0E0', stroke: 'black', strokeThickness: 1 };
+    title = game.add.text(roomListBox.position.x + 48 , roomListBox.position.y + 48, "Available rooms: 0", titleStyle);
+    roomBoxGroup = game.add.group();
+    lockGroup = game.add.group();
+    lockGroup.createMultiple(6, 'lock');
+    playersInRoomGroup = game.add.group();
+    roomTextGroup = game.add.group(); // for removing text later
+    var createRoomButton = game.add.button(roomListBox.position.x + 420, roomListBox.position.y + 56, 'createRoom', createRoom, this, 1, 0, 2);
+
+    setupConnection();
+    socket.emit("{ request: \"LIST\" ");
     // for testing room selection screen
-    testRoomList = [{name: "let's play", id: "001", players: 1, password: true},
-        {name: "noobs only", id: "002", players: 2, password: false},
-        {name: "silver's game", id: "003", players: 3, password: true},
-        {name: "sasku", id: "004", players: 4, password: true},
-        {name: "saskumees", id: "005", players: 2, password: false},
-        {name: "schafkopf", id: "006", players: 3, password: true},]
-    displayRoomSelection(testRoomList);
+    // testRoomList = [{name: "let's play", id: "001", players: 1, password: true},
+    //     {name: "noobs only", id: "002", players: 2, password: false},
+    //     {name: "silver's game", id: "003", players: 3, password: true},
+    //     {name: "sasku", id: "004", players: 4, password: true},
+    //     {name: "saskumees", id: "005", players: 2, password: false},
+    //     {name: "schafkopf", id: "006", players: 3, password: true},]
+    // availableRoomsCount = 6;
+    // displayRoomSelection(testRoomList);
 
 }
  
@@ -114,6 +132,9 @@ function update() {
     emitter.forEachAlive(function(p){
         p.alpha= p.lifespan / emitter.lifespan;
     });
+    title.setText("Available rooms: " + availableRoomsCount.toString());
+    fps.setText(game.time.fps);
+
 }
 
 // Siim: resets the dust particle's position when it goes off screen
@@ -148,18 +169,6 @@ function particleClick(particle) {
 // }
 
 function displayRoomSelection(roomList) {
-    roomListBox = game.add.sprite(400, 90, 'roomListBox');
-    var titleStyle = { font: "48px Helvetica", fill: '#E0E0E0', stroke: 'black', strokeThickness: 1 };
-    title = game.add.text(roomListBox.position.x + 48 , roomListBox.position.y + 32, "Available games", titleStyle);
-    roomBoxGroup = game.add.group();
-    lockGroup = game.add.group();
-    lockGroup.createMultiple(6, 'lock');
-    playersInRoomGroup = game.add.group();
-    roomTextGroup = game.add.group(); // for removing text later
-    var createRoomButton = game.add.button(roomListBox.position.x + 420, roomListBox.position.y + 56, 'createRoom', createRoom, this, 1, 0, 2);
-
-
-
     for (var i = 0; i < roomList.length; i++) {
         // a box for the room
         var roomBox = new Phaser.Button(game, roomListBox.position.x + 20, roomListBox.position.y + 148 + i*92, 'roomBox', selectRoom.bind(undefined, i, roomList), this, 1, 0, 2);
@@ -216,4 +225,30 @@ function selectRoom(n, roomList) {
 
 function createRoom() {
     console.log("Room created.");
+}
+
+function setupConnection() {
+    socket = io.connect('http://sasku.kaara.info');
+    socket.on('connecting', function() {
+        console.log("Connecting...");
+    });
+    socket.on('connect', function() {
+        console.log("Connected!");
+    });
+    socket.on('connect_failed', function() {
+        console.log("Connect failed!");
+    });
+    socket.on('info', function(data) {
+        console.log(data);
+    });
+    socket.on('message', function(message) {
+        switch (message['message']) {
+            case "LIST":
+                if (message['status'] == "success") {
+                    availableRoomsCount = message['games'].length;
+                    displayRoomSelection(message['games']);
+                }
+                break;
+        }
+    });
 }
