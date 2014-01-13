@@ -17,6 +17,9 @@ function preload() {
     game.load.image('dust', 'bin/dust.png'); // added by Siim
     game.load.image('star', 'bin/star.png'); // added by Siim
     game.load.spritesheet('createRoom', 'bin/createroom.png', 202, 72);
+    game.load.spritesheet('createButton', 'bin/createbutton.png', 152, 54);
+    game.load.spritesheet('cancelButton', 'bin/cancelbutton.png', 152, 54);
+
 }
  
 var background;
@@ -103,17 +106,16 @@ function create() {
                 }
             }
         }
-
-        function ParticleEmitter() {
-           
-        }
-
     }
 
     function Connection() {
         var socket = io.connect('http://sasku.kaara.info');
         addSocketEventListeners();
         socket.emit("{ request: \"LIST\" "); // Maybe this shouldn't be here. :)
+
+        this.createRoom = function() {
+            // TODO
+        }
 
         function addSocketEventListeners() {
             socket.on('connecting', function() { console.log("Connecting..."); });
@@ -133,6 +135,7 @@ function create() {
                         break;
                 }
         }
+
     }
 }
  
@@ -153,6 +156,7 @@ function FPSMeter() {
 
 function Lobby() {
     this.availableRoomsCount = 0;
+    var createRoomPrompt;
 
     // Creates the whole lobby window.
     var roomListBox = game.add.sprite(400, 90, 'roomListBox');
@@ -168,8 +172,7 @@ function Lobby() {
     lockGroup.createMultiple(6, 'lock');
     var roomTextGroup = game.add.group();
 
-    // Creates a button for creating a new room.
-    var createRoomButton = game.add.button(roomListBox.position.x + 420, roomListBox.position.y + 56, 'createRoom', this.createRoom, this, 1, 0, 2);
+
 
     this.displayRoomSelection = function(roomList) {
         for (var i = 0; i < roomList.length; i++) {
@@ -225,8 +228,44 @@ function Lobby() {
         }
     }
 
-    this.createRoom = function() {
-        console.log("Room created.");
+    this.createCreateRoomPrompt = function() {
+        console.log("Inside createRoom function");
+        createRoomPrompt = new CreateRoomPrompt();
+
+        function CreateRoomPrompt() {
+            var half = {
+                x: game.width / 2,
+                y: game.height / 2
+            };
+
+            var graphics = game.add.graphics(0, 0);
+            console.log("Inside CreateRoomPromp Object");
+            graphics.beginFill(0x000000, 0.5);
+            graphics.lineStyle(5, 0xE0E0E0, 1);
+            var width = 280;
+            var height = 120;
+            graphics.moveTo(half.x - width, half.y - height);
+            graphics.lineTo(half.x + width, half.y - height);
+            graphics.lineTo(half.x + width, half.y + height);
+            graphics.lineTo(half.x - width, half.y + height);
+            graphics.lineTo(half.x - width, half.y - height);
+            graphics.endFill();
+
+            var createButton = game.add.button(half.x - 182, half.y + 40, 'createButton', connection.createRoom, this, 1, 0, 2);
+            var cancelButton = game.add.button(half.x + 30, half.y + 40, 'cancelButton', kill, this, 1, 0, 2);
+
+            function kill() {
+                graphics.destroy();
+                createButton.destroy();
+                cancelButton.destroy();
+            }
+
+        }
+
+
+
     }
 
+    // Creates a button for creating a new room.
+    var createRoomButton = game.add.button(roomListBox.position.x + 420, roomListBox.position.y + 56, 'createRoom', this.createCreateRoomPrompt, this, 1, 0, 2);
 }
