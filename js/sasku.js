@@ -4,24 +4,24 @@ var game = new Phaser.Game(1440, 900, Phaser.AUTO, '', { preload: preload, creat
 
 
 function preload() {
-    game.load.image('background', 'bin/space_background.jpg');
-    game.load.image('cardback', 'bin/Blue_Back.png');
-    game.load.image('pixel', 'bin/px.png');
-    game.load.image('roomListBox', 'bin/gamesbox.png');
-    game.load.spritesheet('roomBox', 'bin/room.png', 602, 72);
-    game.load.image('lock', 'bin/lock2.png');
-    game.load.image('onePlayer', 'bin/room1.png');
-    game.load.image('twoPlayers', 'bin/room2.png');
-    game.load.image('threePlayers', 'bin/room3.png');
-    game.load.image('fourPlayers', 'bin/room4.png');
-    game.load.image('dust', 'bin/dust.png'); // added by Siim
-    game.load.image('star', 'bin/star.png'); // added by Siim
-    game.load.spritesheet('createRoom', 'bin/createroom.png', 202, 72);
-    game.load.spritesheet('createButton', 'bin/createbutton.png', 152, 54);
-    game.load.spritesheet('cancelButton', 'bin/cancelbutton.png', 152, 54);
+    game.load.image('background', 'img/space_background.jpg');
+    game.load.image('cardback', 'img/Blue_Back.png');
+    game.load.image('pixel', 'img/px.png');
+    game.load.image('roomListBox', 'img/gamesbox.png');
+    game.load.spritesheet('roomBox', 'img/room.png', 602, 72);
+    game.load.image('lock', 'img/lock2.png');
+    game.load.image('onePlayer', 'img/room1.png');
+    game.load.image('twoPlayers', 'img/room2.png');
+    game.load.image('threePlayers', 'img/room3.png');
+    game.load.image('fourPlayers', 'img/room4.png');
+    game.load.image('dust', 'img/dust.png'); // added by Siim
+    game.load.image('star', 'img/star.png'); // added by Siim
+    game.load.spritesheet('createRoom', 'img/createroom.png', 202, 72);
+    game.load.spritesheet('createButton', 'img/createbutton.png', 152, 54);
+    game.load.spritesheet('cancelButton', 'img/cancelbutton.png', 152, 54);
 
 }
- 
+
 var background;
 var connection;
 var fpsMeter;
@@ -46,7 +46,7 @@ function create() {
         addFloatingParticles();
         this.emitter = game.add.emitter(0, 0, 200);
         this.emitter.makeParticles('pixel');
-        this.emitter.gravity = 0; 
+        this.emitter.gravity = 0;
         backgroundImage.inputEnabled = true;
 
         function addFloatingParticles() {
@@ -57,7 +57,7 @@ function create() {
             for (var i = 0; i < 150; i++) {
                 chooseParticle();
                 addParticle();
-            }   
+            }
 
             function chooseParticle() {
                 if (Math.random() > 0.5) {
@@ -138,7 +138,7 @@ function create() {
 
     }
 }
- 
+
 function update() {
     background.emitter.forEachAlive(function(p) {
         p.alpha = p.lifespan / background.emitter.lifespan;
