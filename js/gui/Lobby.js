@@ -56,44 +56,45 @@
             }
         },
         displayRoomSelection: function (roomList) {
+            var that = this;
             roomList.forEach(function (elem, i) {
                 // a box for the room
-                var roomBox = new Phaser.Button(this.game, this.roomListBox.position.x + 20, this.roomListBox.position.y + 148 + i * 92, 'roomBox', this.selectRoom.bind(undefined, i, roomList), this, 1, 0, 2);
-                this.roomBoxGroup.add(roomBox);
+                var roomBox = new Phaser.Button(that.game, that.roomListBox.position.x + 20, that.roomListBox.position.y + 148 + i * 92, 'roomBox', that.selectRoom.bind(undefined, i, roomList), that, 1, 0, 2);
+                that.roomBoxGroup.add(roomBox);
 
                 // name of the room
                 var styleName = { font: "36px Helvetica", fill: '#E0E0E0' };
-                var name = this.game.add.text(roomBox.position.x + 36, roomBox.position.y + 17, elem.name, styleName);
-                this.roomTextGroup.add(name);
+                var name = that.game.add.text(roomBox.position.x + 36, roomBox.position.y + 17, elem.name, styleName);
+                that.roomTextGroup.add(name);
 
                 // a graphical representation of the number of players in the room
                 var playersInRoom;
                 switch (roomList[i].players) {
                 case 1:
-                    playersInRoom = this.game.add.sprite(roomBox.position.x + 460, roomBox.position.y + 1, 'onePlayer');
+                    playersInRoom = that.game.add.sprite(roomBox.position.x + 460, roomBox.position.y + 1, 'onePlayer');
                     break;
                 case 2:
-                    playersInRoom = this.game.add.sprite(roomBox.position.x + 460, roomBox.position.y + 1, 'twoPlayers');
+                    playersInRoom = that.game.add.sprite(roomBox.position.x + 460, roomBox.position.y + 1, 'twoPlayers');
                     break;
                 case 3:
-                    playersInRoom = this.game.add.sprite(roomBox.position.x + 460, roomBox.position.y + 1, 'threePlayers');
+                    playersInRoom = that.game.add.sprite(roomBox.position.x + 460, roomBox.position.y + 1, 'threePlayers');
                     break;
                 case 4:
-                    playersInRoom = this.game.add.sprite(roomBox.position.x + 460, roomBox.position.y + 1, 'fourPlayers');
+                    playersInRoom = that.game.add.sprite(roomBox.position.x + 460, roomBox.position.y + 1, 'fourPlayers');
                     break;
                 default:
                     console.log("invalid number of players in room");
                 }
-                this.playersInRoomGroup.add(playersInRoom);
+                that.playersInRoomGroup.add(playersInRoom);
 
                 // a numerical representation of the number of players in the room
                 var stylePlayers = { font: "20px Helvetica", fill: '#E0E0E0' },
-                    players = this.game.add.text(roomBox.position.x + 463, roomBox.position.y + 9, elem.players + "/4", stylePlayers);
-                this.roomTextGroup.add(players);
+                    players = that.game.add.text(roomBox.position.x + 463, roomBox.position.y + 9, elem.players + "/4", stylePlayers);
+                that.roomTextGroup.add(players);
 
                 // a graphical representation of whether the room is password protected
                 if (roomList[i].password) {
-                    var lock = this.lockGroup.getFirstExists(false);
+                    var lock = that.lockGroup.getFirstExists(false);
                     lock.reset(roomBox.position.x + 550, roomBox.position.y + 10);
                 }
             });

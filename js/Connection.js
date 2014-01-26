@@ -7,7 +7,7 @@
     },
 
         Connection = function () {
-            this.socket = io.connect('http://sasku.kaara.info');
+            this.socket = io.connect('http://sasku.kaara.info:80');
 
             var addLogHandlers = function (connection) {
                 connection.socket.on('connecting', function () {console.log('Connecting...'); });
@@ -21,13 +21,15 @@
     Connection.prototype = {
         addHandler: function (eventHandler) {
             this.socket.on('message', function (message) {
-                if (message.request === eventHandler.event) {
-                    eventHandler.handle(message);
+                var json = JSON.parse(message);
+                console.log(eventHandler.event);
+                if (json.message === eventHandler.event) {
+                    eventHandler.handle(json);
                 }
             });
         },
         sendEvent: function (event) {
-            this.socket.emit(JSON.stringify(event));
+            this.socket.send(JSON.stringify(event));
         }
     };
 
