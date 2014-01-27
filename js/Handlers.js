@@ -2,7 +2,7 @@
     "use strict";
 
     var ListHandler = function (game, lobby) {
-        Game.Handler.call('LIST');
+        Game.Handler.call(this, 'LIST');
         this.game = game;
         this.lobby = lobby;
     };

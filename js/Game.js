@@ -15,13 +15,13 @@
             lobby = new Game.Lobby(game, connection);
             lobby.preload();
             connection.addHandler(new Game.ListHandler(game, lobby));
-            connection.sendEvent({request: 'LIST'});
         },
 
         create = function () {
             background.create();
             fpsMeter.create();
             lobby.create();
+            connection.sendEvent({request: 'LIST'});
         },
 
         update = function () {
